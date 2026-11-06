@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ESP8266 Project Codes – Sensors &amp; Web Servers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#071a2b; --bg-2:#0c2740; --panel:#0f2f4c; --grid:rgba(255,255,255,.05);
+  --ink:#e6f1fb; --ink-dim:#8fa9c4; --line:#1c3e5e;
+  --wifi:#00d1c1; --wifi-2:#3fa9ff; --amber:#ffb020;
+  --paper:#f6f9fc; --ink-d:#0d1b2a; --ink-d2:#48586e; --line-d:#d7e0ea; --tint:#eaf2f9;
+  --code:#0a1420; --code-bar:#0f1e30;
+  --c-basic:#0f9d8f; --c-web:#2f7de0; --c-net:#c2410c;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --disp:'Space Grotesk',var(--sans);
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,Menlo,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:150px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  margin:0;color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;
+  background-color:var(--bg);
+  background-image:radial-gradient(circle at 1px 1px, var(--grid) 1px, transparent 0);
+  background-size:26px 26px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+button,input{font:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--wifi);outline-offset:2px}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;padding:calc(env(safe-area-inset-top,0px) + 50px) 0 34px;border-bottom:1px solid var(--line)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:center;position:relative;z-index:1}
+@media (max-width:840px){.hero-grid{grid-template-columns:1fr}}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--wifi);text-transform:uppercase;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--wifi);box-shadow:0 0 0 0 rgba(0,209,193,.6);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,209,193,.5)}70%{box-shadow:0 0 0 10px rgba(0,209,193,0)}100%{box-shadow:0 0 0 0 rgba(0,209,193,0)}}
+h1{font-family:var(--disp);font-weight:800;font-size:clamp(30px,5.4vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px;color:#fff}
+h1 span{color:var(--wifi)}
+.lead{margin:0 0 20px;max-width:54ch;font-size:16.5px;color:var(--ink-dim)}
+.stats{display:flex;flex-wrap:wrap;gap:8px 26px;font-family:var(--mono);font-size:13px;color:var(--ink-dim)}
+.stats b{display:block;font-family:var(--disp);font-size:30px;line-height:1;color:var(--amber);font-weight:700}
+.board{width:100%;height:auto;max-width:420px;justify-self:end}
+
+.ghost{padding:9px 20px;border-radius:7px;border:1px solid var(--wifi);background:transparent;color:var(--wifi);cursor:pointer;font-size:14px;font-weight:600}
+.ghost:hover{background:var(--wifi);color:#012}
+
+/* ---------- sections ---------- */
+main{padding:20px 0 70px}
+.cat{margin-top:50px;--cc:var(--c-basic)}
+.cat-head{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px;border-bottom:2px solid var(--cc);padding-bottom:12px}
+.cat-num{font-family:var(--disp);font-weight:800;font-size:50px;line-height:.8;color:var(--cc);filter:brightness(1.3)}
+.cat-head h2{margin:0;font-family:var(--disp);font-size:clamp(22px,3.2vw,32px);color:#fff;letter-spacing:-.01em;line-height:1.1}
+.cat-head p{margin:4px 0 0;color:var(--ink-dim);max-width:64ch;font-size:15px}
+
+/* ---------- card ---------- */
+.card{background:var(--paper);color:var(--ink-d);border-radius:8px;margin-bottom:16px;border-left:7px solid var(--cc);box-shadow:0 8px 22px rgba(0,0,0,.28);overflow:hidden}
+.card-btn{all:unset;box-sizing:border-box;display:grid;grid-template-columns:auto 1fr auto;gap:6px 16px;align-items:center;width:100%;padding:16px 20px;cursor:pointer}
+.card-btn:hover{background:var(--tint)}
+.card-btn:focus-visible{outline:2px solid var(--cc);outline-offset:-4px}
+.tag{font-family:var(--mono);font-size:12px;font-weight:600;color:#fff;background:var(--cc);padding:4px 9px;border-radius:4px;min-width:60px;text-align:center}
+.card-title{font-family:var(--disp);font-weight:700;font-size:19px;line-height:1.2}
+.card-sub{grid-column:2;color:var(--ink-d2);font-size:14.5px;margin-top:-2px}
+.right{grid-row:1;grid-column:3;display:flex;align-items:center;gap:12px}
+.pins-badge{font-family:var(--mono);font-size:12px;color:var(--cc);border:1px solid currentColor;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.chev{width:12px;height:12px;border-right:2.5px solid var(--ink-d2);border-bottom:2.5px solid var(--ink-d2);transform:rotate(45deg);transition:transform .2s;margin-bottom:4px}
+.card.open .chev{transform:rotate(-135deg);margin-bottom:-3px}
+@media (max-width:640px){.card-btn{grid-template-columns:1fr auto}.tag{grid-column:1}.card-title{grid-column:1;grid-row:2}.card-sub{grid-column:1;grid-row:3}.right{grid-column:2;grid-row:1}}
+.card-body{display:none;border-top:1px solid var(--line-d);padding:20px;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:26px}
+.card.open .card-body{display:grid}
+@media (max-width:900px){.card-body{grid-template-columns:minmax(0,1fr)}}
+.info h4{margin:18px 0 8px;font-family:var(--disp);font-size:13.5px;letter-spacing:.02em;color:var(--ink-d);text-transform:uppercase}
+.info h4:first-child{margin-top:0}
+.info p{margin:0 0 8px;font-size:15px;color:var(--ink-d2)}
+table.pins{border-collapse:collapse;width:100%;font-size:13px;font-family:var(--mono)}
+.pins th{text-align:left;font-family:var(--sans);font-weight:600;font-size:12px;color:var(--ink-d2);padding:4px 8px;border-bottom:2px solid var(--line-d)}
+.pins td{padding:5px 8px;border-bottom:1px solid var(--line-d)}
+.pins td:first-child{color:var(--cc);font-weight:600}
+ul.tips{margin:0;padding-left:18px;font-size:14px;color:var(--ink-d2)}
+ul.tips li{margin-bottom:4px}
+.warn{margin:14px 0 0;border-left:4px solid #c2410c;background:#fff1e6;padding:9px 12px;border-radius:0 6px 6px 0;font-size:13.5px;color:#5a2205}
+.warn b{color:#c2410c}
+.demo{margin-top:16px;border:1px dashed var(--cc);border-radius:8px;padding:14px;background:#fff}
+.demo-label{font-family:var(--mono);font-size:11.5px;color:var(--ink-d2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.phone-btn{display:inline-block;background:var(--cc);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-size:13.5px;font-weight:600;margin:3px 6px 3px 0;cursor:default}
+
+/* ---------- code ---------- */
+.codebox{min-width:0;align-self:start;position:sticky;top:128px}
+@media (max-width:900px){.codebox{position:static}}
+.codetabs{display:flex;gap:2px;flex-wrap:wrap}
+.codetab{font-size:12.5px;padding:6px 12px;border:none;background:#122740;color:#8fa9c4;border-radius:6px 6px 0 0;cursor:pointer}
+.codetab[aria-selected="true"]{background:var(--code);color:#fff}
+.codebar{display:flex;justify-content:space-between;align-items:center;background:var(--code-bar);color:#7d97b8;font-family:var(--mono);font-size:12px;padding:6px 8px 6px 14px}
+.copy{background:transparent;color:#cfe0f2;border:1px solid #274863;border-radius:6px;padding:3px 12px;font-size:12.5px;cursor:pointer}
+.copy:hover{background:#183350}
+.copy.done{color:var(--wifi);border-color:var(--wifi)}
+pre{margin:0;background:var(--code);color:#d5e2f0;padding:14px 16px;overflow:auto;max-height:560px;font-family:var(--mono);font-size:12.6px;line-height:1.6;tab-size:2;border-radius:0 0 6px 6px}
+.t-c{color:#5fae8f;font-style:italic}.t-s{color:#f0a970}.t-p{color:#c792ea}.t-n{color:#a9dcb0}.t-k{color:#5fb2ff}.t-c2{color:#ffb020}.t-f{color:#4fd1c5}.t-html{color:#f28fb0}
+
+.empty{text-align:center;color:var(--ink-dim);padding:70px 0}
+footer{border-top:1px solid var(--line);padding:24px 0 44px;color:var(--ink-dim);font-size:13px}
+footer a{color:var(--wifi)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow"><span class="dot"></span>ESP8266 · Wi-Fi Microcontroller</p>
+      <h1>From a single sensor to a <span>full web server</span></h1>
+      <p class="lead">Nine ready-to-flash ESP8266 sketches: three basic sensor readers, four self-hosted web control panels, and a two-board Wi-Fi messenger. Copy, fill in your Wi-Fi name and password, and upload.</p>
+      <div class="stats">
+        <span><b id="statItems">0</b>sketches</span>
+        <span><b id="statCats">3</b>groups</span>
+        <span><b>D1</b>Mini / NodeMCU pinout</span>
+      </div>
+      <button class="ghost" id="toggleAll" type="button" style="margin-top:20px">Expand all</button>
+    </div>
+    <svg class="board" viewBox="0 0 360 260" aria-hidden="true">
+      <rect x="70" y="60" width="140" height="140" rx="10" fill="#0c2740" stroke="#1c3e5e" stroke-width="2"/>
+      <rect x="95" y="85" width="90" height="90" rx="6" fill="#0f2f4c" stroke="#2f7de0" stroke-width="2"/>
+      <text x="140" y="127" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="#e6f1fb">ESP</text>
+      <text x="140" y="142" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="#e6f1fb">8266</text>
+      <g fill="none" stroke="#ffb020" stroke-width="2">
+        <rect x="60" y="72" width="10" height="6"/><rect x="60" y="86" width="10" height="6"/><rect x="60" y="100" width="10" height="6"/><rect x="60" y="114" width="10" height="6"/><rect x="60" y="128" width="10" height="6"/><rect x="60" y="142" width="10" height="6"/><rect x="60" y="156" width="10" height="6"/><rect x="60" y="170" width="10" height="6"/>
+        <rect x="210" y="72" width="10" height="6"/><rect x="210" y="86" width="10" height="6"/><rect x="210" y="100" width="10" height="6"/><rect x="210" y="114" width="10" height="6"/><rect x="210" y="128" width="10" height="6"/><rect x="210" y="142" width="10" height="6"/><rect x="210" y="156" width="10" height="6"/><rect x="210" y="170" width="10" height="6"/>
+      </g>
+      <g stroke="#00d1c1" stroke-width="3" fill="none" stroke-linecap="round">
+        <path d="M140 60 a34 34 0 0 1 48 0" opacity="0"><animate attributeName="opacity" values="0;1;0" dur="2.4s" begin="0s" repeatCount="indefinite"/></path>
+        <path d="M140 60 a56 56 0 0 1 78 0" opacity="0"><animate attributeName="opacity" values="0;1;0" dur="2.4s" begin=".3s" repeatCount="indefinite"/></path>
+        <path d="M140 60 a78 78 0 0 1 108 0" opacity="0"><animate attributeName="opacity" values="0;1;0" dur="2.4s" begin=".6s" repeatCount="indefinite"/></path>
+      </g>
+      <circle cx="140" cy="60" r="4" fill="#00d1c1"/>
+    </svg>
+  </div>
+</header>
+
+<main><div class="wrap" id="content"></div></main>
+
+<footer>
+  <div class="wrap">Pin names such as D1–D8 are the Wi-Fi shield / NodeMCU labels, mapped by the board package to the real GPIO numbers. Replace REPLACE_WITH_YOUR_SSID, REPLACE_WITH_YOUR_PASSWORD and any IP address before uploading. Select the correct board under Tools before flashing.</div>
+</footer>
+
+<script>
+/* ================= DATA ================= */
+const CATS = [
+{ id:"basic", color:"var(--c-basic)", title:"Basic sensor sketches", desc:"No Wi-Fi yet — just read a digital sensor and react to it. Good first uploads to confirm your wiring.", items:[
+
+  { n:"PIR motion detector", tag:"01", pins:"D5 in · D2 out",
+    d:"Reads a PIR module and turns an LED on for as long as motion is seen, while logging to Serial.",
+    pinsTable:[["PIR OUT","D5 (INPUT)"],["LED +","D2 (OUTPUT)"],["Common GND","GND"]],
+    tips:["Let the PIR settle for 30–60 seconds after power-up before trusting readings.","Most small PIR boards give HIGH while motion is present, unlike the flame and smoke sensors below."],
+    codes:[{label:"pir_motion.ino",file:"pir_motion.ino",code:`#define PIR_PIN D5
+#define LED_PIN D2
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  digitalWrite(LED_PIN, LOW);
+
+  Serial.println("PIR Motion Detection Started");
+}
+
+void loop() {
+
+  int motion = digitalRead(PIR_PIN);
+
+  if (motion == HIGH) {
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("Motion Detected!");
+  } 
+  else {
+    digitalWrite(LED_PIN, LOW);
+    Serial.println("No Motion");
+  }
+
+  delay(500);
+}`}]},
+
+  { n:"Flame sensor alert", tag:"02", pins:"D5 in · D2 out",
+    d:"Reads an IR flame sensor module and lights an LED the moment a flame is seen.",
+    pinsTable:[["Flame OUT","D5 (INPUT)"],["LED +","D2 (OUTPUT)"],["Common GND","GND"]],
+    tips:["Most flame comparator boards are active LOW: the pin drops to LOW when a flame is detected.","Sunlight and bright bulbs also emit IR and can trigger false alarms — this is a demo circuit, not a certified detector."],
+    codes:[{label:"flame_sensor.ino",file:"flame_sensor.ino",code:`#define FLAME_PIN D5
+#define LED_PIN D2
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(FLAME_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  digitalWrite(LED_PIN, LOW);
+
+  Serial.println("Flame Sensor Started");
+}
+
+void loop() {
+
+  int flame = digitalRead(FLAME_PIN);
+
+  // Most flame modules give LOW when flame is detected
+  if (flame == LOW) {
+
+    digitalWrite(LED_PIN, HIGH);
+
+    Serial.println("FLAME DETECTED!");
+
+  } 
+  else {
+
+    digitalWrite(LED_PIN, LOW);
+
+    Serial.println("No Flame Detected");
+
+  }
+
+  delay(500);
+}`}]},
+
+  { n:"MQ-2 smoke / gas sensor", tag:"03", pins:"D5 in · D2 out",
+    d:"Reads the digital output of an MQ-2 module and raises an alert once the gas or smoke level crosses the board's own threshold.",
+    pinsTable:[["MQ-2 DO","D5 (INPUT)"],["LED +","D2 (OUTPUT)"],["Common GND","GND"]],
+    tips:["MQ-2 heaters need 20–60 seconds to warm up before readings settle.","The onboard potentiometer sets the DO threshold — turn it while watching Serial output to tune sensitivity.","For an exact reading in ppm, use the AO analog pin instead and calibrate against a known gas source."],
+    codes:[{label:"mq2_smoke.ino",file:"mq2_smoke.ino",code:`#define SMOKE_PIN D5
+#define LED_PIN D2
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(SMOKE_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+
+  digitalWrite(LED_PIN, LOW);
+
+  Serial.println("MQ-2 Smoke Sensor Started");
+  Serial.println("Allow the sensor to warm up...");
+}
+
+void loop() {
+
+  int smoke = digitalRead(SMOKE_PIN);
+
+  // Most MQ-2 modules give LOW when threshold is exceeded
+  if (smoke == LOW) {
+
+    digitalWrite(LED_PIN, HIGH);
+
+    Serial.println("SMOKE/GAS DETECTED!");
+
+  } 
+  else {
+
+    digitalWrite(LED_PIN, LOW);
+
+    Serial.println("Air Normal");
+
+  }
+
+  delay(500);
+}`}]}
+]},
+
+{ id:"web", color:"var(--c-web)", title:"Wi-Fi web server projects", desc:"The ESP8266 hosts its own web page. Open the printed IP address in any browser on the same network to control or monitor the board.", items:[
+
+  { n:"Two-LED web switch", tag:"04", pins:"D1 · D2",
+    d:"A page with ON/OFF buttons for two LEDs. Clicking a button loads a URL like /led1/on, which the sketch matches and reacts to.",
+    pinsTable:[["LED 1 +","D1"],["LED 2 +","D2"],["Common GND","GND"]],
+    tips:["Uses ESP8266WebServer, which is simpler to read than raw client.read() parsing.","Each button redirects back to / with an HTTP 303, so the page always reflects the current state on reload."],
+    demo:{label:"Rendered page",buttons:["LED 1  ON / OFF","LED 2  ON / OFF"]},
+    codes:[{label:"esp8266_2led_server.ino",file:"esp8266_2led_server.ino",code:`#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
+
+ESP8266WebServer server(80);
+
+#define LED1 D1
+#define LED2 D2
+
+void setup() {
+
+  Serial.begin(9600);
+
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi Connected!");
+
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  // Main page
+  server.on("/", []() {
+
+    String page = "<html>";
+    page += "<head>";
+    page += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
+    page += "<title>ESP8266 LED Control</title>";
+    page += "</head>";
+
+    page += "<body style='text-align:center;font-family:Arial'>";
+    
+    page += "<h1>ESP8266 LED Control</h1>";
+
+    page += "<h2>LED 1</h2>";
+    page += "<a href='/led1/on'><button>ON</button></a> ";
+    page += "<a href='/led1/off'><button>OFF</button></a>";
+
+    page += "<h2>LED 2</h2>";
+    page += "<a href='/led2/on'><button>ON</button></a> ";
+    page += "<a href='/led2/off'><button>OFF</button></a>";
+
+    page += "</body>";
+    page += "</html>";
+
+    server.send(200, "text/html", page);
+  });
+
+  // LED 1 ON
+  server.on("/led1/on", []() {
+    digitalWrite(LED1, HIGH);
+    server.sendHeader("Location", "/");
+    server.send(303);
+  });
+
+  // LED 1 OFF
+  server.on("/led1/off", []() {
+    digitalWrite(LED1, LOW);
+    server.sendHeader("Location", "/");
+    server.send(303);
+  });
+
+  // LED 2 ON
+  server.on("/led2/on", []() {
+    digitalWrite(LED2, HIGH);
+    server.sendHeader("Location", "/");
+    server.send(303);
+  });
+
+  // LED 2 OFF
+  server.on("/led2/off", []() {
+    digitalWrite(LED2, LOW);
+    server.sendHeader("Location", "/");
+    server.send(303);
+  });
+
+  server.begin();
+
+  Serial.println("Web Server Started!");
+}
+
+void loop() {
+  server.handleClient();
+}`},
+    {label:"esp8266_client_style.ino (raw WiFiServer version)",file:"esp8266_client_style.ino",code:`// Alternative style using WiFiServer + manual HTTP parsing
+// instead of the ESP8266WebServer library.
+
+#include <ESP8266WiFi.h>
+
+const char* ssid     = "REPLACE_WITH_YOUR_SSID";
+const char* password = "REPLACE_WITH_YOUR_PASSWORD";
+
+WiFiServer server(80);
+
+String header;
+
+String output5State = "off";
+String output4State = "off";
+
+const int output5 = 5;
+const int output4 = 4;
+
+unsigned long currentTime = millis();
+unsigned long previousTime = 0;
+const long timeoutTime = 2000;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(output5, OUTPUT);
+  pinMode(output4, OUTPUT);
+  digitalWrite(output5, LOW);
+  digitalWrite(output4, LOW);
+
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  server.begin();
+}
+
+void loop(){
+  WiFiClient client = server.available();
+
+  if (client) {
+    Serial.println("New Client.");
+    String currentLine = "";
+    currentTime = millis();
+    previousTime = currentTime;
+    while (client.connected() && currentTime - previousTime <= timeoutTime) {
+      currentTime = millis();
+      if (client.available()) {
+        char c = client.read();
+        Serial.write(c);
+        header += c;
+        if (c == '\n') {
+          if (currentLine.length() == 0) {
+            client.println("HTTP/1.1 200 OK");
+            client.println("Content-type:text/html");
+            client.println("Connection: close");
+            client.println();
+
+            if (header.indexOf("GET /5/on") >= 0) {
+              output5State = "on";
+              digitalWrite(output5, HIGH);
+            } else if (header.indexOf("GET /5/off") >= 0) {
+              output5State = "off";
+              digitalWrite(output5, LOW);
+            } else if (header.indexOf("GET /4/on") >= 0) {
+              output4State = "on";
+              digitalWrite(output4, HIGH);
+            } else if (header.indexOf("GET /4/off") >= 0) {
+              output4State = "off";
+              digitalWrite(output4, LOW);
+            }
+
+            client.println("<!DOCTYPE html><html><body>");
+            client.println("<h1>ESP8266 Web Server</h1>");
+            client.println("<p>GPIO 5 - State " + output5State + "</p>");
+            if (output5State == "off") {
+              client.println("<p><a href=\"/5/on\"><button>ON</button></a></p>");
+            } else {
+              client.println("<p><a href=\"/5/off\"><button>OFF</button></a></p>");
+            }
+            client.println("<p>GPIO 4 - State " + output4State + "</p>");
+            if (output4State == "off") {
+              client.println("<p><a href=\"/4/on\"><button>ON</button></a></p>");
+            } else {
+              client.println("<p><a href=\"/4/off\"><button>OFF</button></a></p>");
+            }
+            client.println("</body></html>");
+            client.println();
+            break;
+          } else {
+            currentLine = "";
+          }
+        } else if (c != '\r') {
+          currentLine += c;
+        }
+      }
+    }
+    header = "";
+    client.stop();
+    Serial.println("Client disconnected.");
+  }
+}`}]},
+
+  { n:"DHT11 temperature & humidity monitor", tag:"05", pins:"D4",
+    d:"Serves a self-refreshing page that shows live temperature and humidity from a DHT11 sensor.", lib:"DHT sensor library (and Adafruit Unified Sensor) from the Library Manager",
+    pinsTable:[["DHT DATA","D4"],["VCC / GND","3.3–5V / GND"]],
+    tips:["The page auto-refreshes every 2 seconds via a meta refresh tag — no JavaScript needed.","DHT11 updates at most once per second, so a 2 s page refresh is a safe match."],
+    demo:{label:"Rendered page",buttons:["Temperature: 24.5 °C","Humidity: 61.0 %"]},
+    codes:[{label:"esp8266_dht11_monitor.ino",file:"esp8266_dht11_monitor.ino",code:`#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <DHT.h>
+
+#define DHT_PIN D4
+#define DHT_TYPE DHT11
+
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
+
+DHT dht(DHT_PIN, DHT_TYPE);
+ESP8266WebServer server(80);
+
+void handleRoot() {
+
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  String page = "<html>";
+  page += "<head>";
+  page += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
+  page += "<meta http-equiv='refresh' content='2'>";
+  page += "<title>Temperature Monitor</title>";
+
+  page += "<style>";
+  page += "body { font-family: Arial; text-align: center; background: #f2f2f2; }";
+  page += ".box { background: white; padding: 30px; margin: 30px auto; max-width: 400px; border-radius: 15px; }";
+  page += ".value { font-size: 35px; margin: 20px; }";
+  page += "</style>";
+
+  page += "</head>";
+  page += "<body>";
+
+  page += "<div class='box'>";
+
+  page += "<h1>IoT Monitoring</h1>";
+
+  page += "<h2>Temperature</h2>";
+  page += "<div class='value'>";
+  page += String(temperature, 1);
+  page += " &deg;C</div>";
+
+  page += "<h2>Humidity</h2>";
+  page += "<div class='value'>";
+  page += String(humidity, 1);
+  page += " %</div>";
+
+  page += "<p>ESP8266 + DHT11</p>";
+
+  page += "</div>";
+
+  page += "</body>";
+  page += "</html>";
+
+  server.send(200, "text/html", page);
+}
+
+void setup() {
+
+  Serial.begin(9600);
+
+  dht.begin();
+
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi Connected!");
+
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  server.on("/", handleRoot);
+
+  server.begin();
+
+  Serial.println("Web Server Started!");
+}
+
+void loop() {
+
+  server.handleClient();
+
+}`}]},
+
+  { n:"Fire & smoke alert dashboard", tag:"06", pins:"D5 · D6 · D2 · D1",
+    d:"Combines a flame and an MQ-2 smoke sensor into one status page, and drives an LED and buzzer if either trips.",
+    pinsTable:[["Flame OUT","D5"],["Smoke DO","D6"],["LED +","D2"],["Buzzer +","D1"]],
+    tips:["Both sensors are treated as active LOW, matching the standalone sketches above.","The page colours the heading green for safe and red for an alert, and refreshes every 2 seconds."],
+    demo:{label:"Rendered page",buttons:["SAFE (green)","FIRE / SMOKE ALERT! (red)"]},
+    codes:[{label:"esp8266_fire_smoke_dashboard.ino",file:"esp8266_fire_smoke_dashboard.ino",code:`#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
+
+ESP8266WebServer server(80);
+
+#define FLAME_PIN D5
+#define SMOKE_PIN D6
+
+#define LED_PIN D2
+#define BUZZER_PIN D1
+
+
+void handleRoot() {
+
+  int flame = digitalRead(FLAME_PIN);
+  int smoke = digitalRead(SMOKE_PIN);
+
+  String status;
+
+  // Most modules are ACTIVE LOW
+  if (flame == LOW || smoke == LOW) {
+
+    status = "<h1 style='color:red;'>FIRE / SMOKE ALERT!</h1>";
+
+    digitalWrite(LED_PIN, HIGH);
+    digitalWrite(BUZZER_PIN, HIGH);
+
+  } 
+  else {
+
+    status = "<h1 style='color:green;'>SAFE</h1>";
+
+    digitalWrite(LED_PIN, LOW);
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+
+
+  String page = "<html>";
+
+  page += "<head>";
+  page += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
+  page += "<meta http-equiv='refresh' content='2'>";
+  page += "<title>Fire & Smoke Alert</title>";
+
+  page += "<style>";
+  page += "body{font-family:Arial;text-align:center;background:#f2f2f2;padding:20px;}";
+  page += ".box{background:white;padding:30px;margin:auto;max-width:400px;border-radius:15px;}";
+  page += ".sensor{font-size:22px;margin:20px;}";
+  page += "</style>";
+
+  page += "</head>";
+
+  page += "<body>";
+
+  page += "<div class='box'>";
+
+  page += "<h2>Fire & Smoke Monitoring</h2>";
+
+  page += status;
+
+  page += "<div class='sensor'>";
+  page += "Flame Sensor: ";
+
+  if (flame == LOW)
+    page += "<b>DETECTED</b>";
+  else
+    page += "No Flame";
+
+  page += "</div>";
+
+
+  page += "<div class='sensor'>";
+  page += "Smoke Sensor: ";
+
+  if (smoke == LOW)
+    page += "<b>DETECTED</b>";
+  else
+    page += "No Smoke";
+
+  page += "</div>";
+
+  page += "<p>ESP8266 Web Server</p>";
+
+  page += "</div>";
+
+  page += "</body>";
+  page += "</html>";
+
+
+  server.send(200, "text/html", page);
+}
+
+
+void setup() {
+
+  Serial.begin(9600);
+
+  pinMode(FLAME_PIN, INPUT);
+  pinMode(SMOKE_PIN, INPUT);
+
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+
+  digitalWrite(LED_PIN, LOW);
+  digitalWrite(BUZZER_PIN, LOW);
+
+
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+
+  Serial.println("WiFi Connected!");
+
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+
+
+  server.on("/", handleRoot);
+
+  server.begin();
+
+  Serial.println("Web Server Started!");
+}
+
+
+void loop() {
+
+  server.handleClient();
+
+}`}]},
+
+  { n:"Servo control panel", tag:"07", pins:"D4",
+    d:"A page with left/right nudges, five preset angles, and a sweep button for a hobby servo attached to the ESP8266.", lib:"Servo (ESP8266 core, install \"Servo\" if not already present)",
+    pinsTable:[["Servo signal","D4"],["Servo V+","5V (separate supply recommended)"],["Servo GND","GND (shared with ESP8266)"]],
+    tips:["Power the servo from its own 5 V source if it twitches or resets the board — the same rule as any Arduino servo project.","Every button reloads the page with the new angle shown at the top."],
+    demo:{label:"Rendered page",buttons:["Left  Right","0°  45°  90°  135°  180°","Sweep"]},
+    codes:[{label:"esp8266_servo_panel.ino",file:"esp8266_servo_panel.ino",code:`#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <Servo.h>
+
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
+
+ESP8266WebServer server(80);
+
+Servo myServo;
+
+#define SERVO_PIN D4
+
+int angle = 90;
+
+
+void handleRoot() {
+
+  String page = "<html>";
+
+  page += "<head>";
+  page += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
+  page += "<title>Servo Control</title>";
+
+  page += "<style>";
+
+  page += "body{";
+  page += "font-family:Arial;";
+  page += "text-align:center;";
+  page += "background:#f2f2f2;";
+  page += "}";
+
+  page += ".box{";
+  page += "background:white;";
+  page += "padding:30px;";
+  page += "margin:30px auto;";
+  page += "max-width:400px;";
+  page += "border-radius:20px;";
+  page += "}";
+
+  page += "button{";
+  page += "font-size:20px;";
+  page += "padding:15px 25px;";
+  page += "margin:8px;";
+  page += "}";
+
+  page += "</style>";
+
+  page += "</head>";
+
+  page += "<body>";
+
+  page += "<div class='box'>";
+
+  page += "<h1>Servo Control</h1>";
+
+  page += "<h2>Current Angle: ";
+  page += String(angle);
+  page += "&deg;</h2>";
+
+
+  page += "<a href='/left'>";
+  page += "<button>Left</button>";
+  page += "</a>";
+
+  page += "<a href='/right'>";
+  page += "<button>Right</button>";
+  page += "</a>";
+
+  page += "<br>";
+
+
+  page += "<a href='/0'>";
+  page += "<button>0&deg;</button>";
+  page += "</a>";
+
+  page += "<a href='/45'>";
+  page += "<button>45&deg;</button>";
+  page += "</a>";
+
+  page += "<a href='/90'>";
+  page += "<button>90&deg;</button>";
+  page += "</a>";
+
+  page += "<br>";
+
+
+  page += "<a href='/135'>";
+  page += "<button>135&deg;</button>";
+  page += "</a>";
+
+  page += "<a href='/180'>";
+  page += "<button>180&deg;</button>";
+  page += "</a>";
+
+  page += "<br><br>";
+
+  page += "<a href='/sweep'>";
+  page += "<button>Sweep</button>";
+  page += "</a>";
+
+  page += "</div>";
+
+  page += "</body>";
+
+  page += "</html>";
+
+
+  server.send(200, "text/html", page);
+}
+
+
+// Move servo to an angle
+void moveServo(int newAngle) {
+
+  angle = constrain(newAngle, 0, 180);
+
+  myServo.write(angle);
+
+  delay(300);
+
+  server.sendHeader("Location", "/");
+  server.send(303);
+}
+
+
+// Left
+void left() {
+
+  angle -= 15;
+
+  if (angle < 0)
+    angle = 0;
+
+  myServo.write(angle);
+
+  server.sendHeader("Location", "/");
+  server.send(303);
+}
+
+
+// Right
+void right() {
+
+  angle += 15;
+
+  if (angle > 180)
+    angle = 180;
+
+  myServo.write(angle);
+
+  server.sendHeader("Location", "/");
+  server.send(303);
+}
+
+
+// Sweep servo
+void sweep() {
+
+  for (int i = 0; i <= 180; i++) {
+
+    myServo.write(i);
+    delay(10);
+  }
+
+  for (int i = 180; i >= 0; i--) {
+
+    myServo.write(i);
+    delay(10);
+  }
+
+  angle = 90;
+
+  myServo.write(angle);
+
+  server.sendHeader("Location", "/");
+  server.send(303);
+}
+
+
+void setup() {
+
+  Serial.begin(9600);
+
+  myServo.attach(SERVO_PIN);
+
+  myServo.write(angle);
+
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+
+    delay(500);
+
+    Serial.print(".");
+  }
+
+  Serial.println();
+
+  Serial.println("WiFi Connected!");
+
+  Serial.print("IP Address: ");
+
+  Serial.println(WiFi.localIP());
+
+
+  // Main page
+  server.on("/", handleRoot);
+
+
+  // Fixed angles
+  server.on("/0", []() {
+    moveServo(0);
+  });
+
+  server.on("/45", []() {
+    moveServo(45);
+  });
+
+  server.on("/90", []() {
+    moveServo(90);
+  });
+
+  server.on("/135", []() {
+    moveServo(135);
+  });
+
+  server.on("/180", []() {
+    moveServo(180);
+  });
+
+
+  // Left and right
+  server.on("/left", left);
+
+  server.on("/right", right);
+
+
+  // Sweep
+  server.on("/sweep", sweep);
+
+
+  server.begin();
+
+  Serial.println("Servo Web Server Started!");
+}
+
+
+void loop() {
+
+  server.handleClient();
+
+}`}]}
+]},
+
+{ id:"net", color:"var(--c-net)", title:"Board-to-board messaging", desc:"Two ESP8266 boards on the same Wi-Fi network send plain-text messages to each other's IP address.", items:[
+
+  { n:"ESP-to-ESP Wi-Fi messenger (A + B)", tag:"08–09", pins:"—",
+    d:"Board A reads a line typed into its Serial Monitor and sends it as an HTTP GET to Board B's IP address. Board B receives it on a /message endpoint and prints it. Flash the identical sketch to both boards; only the otherESP address differs.",
+    pinsTable:[["Board A → find its IP","printed to Serial as \"My IP\""],["Board B → find its IP","printed to Serial as \"My IP\""],["otherESP on Board A","set to Board B's IP address"],["otherESP on Board B","set to Board A's IP address"]],
+    tips:["Flash Board B first, open its Serial Monitor, and copy the IP address it prints.","Then set otherESP in Board A's sketch to that address before uploading to Board A — and the same in reverse if you want two-way chat.","Both boards must be on the same Wi-Fi network and able to reach each other (some public/guest Wi-Fi networks block device-to-device traffic)."],
+    warn:"This sends plain, unencrypted text over the local network. Do not use it for anything private or safety-critical.",
+    codes:[
+      {label:"esp8266_A_messenger.ino",file:"esp8266_A_messenger.ino",code:`// ---------- ESP8266  A ----------
+// Flash this to board A. Change otherESP to board B's IP address.
+
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
+
+// IP address of ESP8266 B
+const char* otherESP = "192.168.1.105";
+
+ESP8266WebServer server(80);
+
+
+// Receive message
+void receiveMessage() {
+
+  if (server.hasArg("msg")) {
+
+    String message = server.arg("msg");
+
+    Serial.print("Received: ");
+    Serial.println(message);
+
+    server.send(200, "text/plain", "Message received");
+  }
+}
+
+
+// Send message
+void sendMessage(String message) {
+
+  WiFiClient client;
+
+  String url = "http://" + String(otherESP) +
+               "/message?msg=" + message;
+
+  Serial.print("Sending: ");
+  Serial.println(message);
+
+  if (client.connect(otherESP, 80)) {
+
+    client.println("GET " + url + " HTTP/1.1");
+    client.println("Host: " + String(otherESP));
+    client.println("Connection: close");
+    client.println();
+
+    delay(100);
+
+    client.stop();
+
+  } else {
+
+    Serial.println("Connection failed!");
+  }
+}
+
+
+void setup() {
+
+  Serial.begin(115200);
+
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi Connected!");
+
+  Serial.print("My IP: ");
+  Serial.println(WiFi.localIP());
+
+  // Receiver endpoint
+  server.on("/message", receiveMessage);
+
+  server.begin();
+
+  Serial.println("Server started");
+
+  Serial.println();
+  Serial.println("Type message in Serial Monitor:");
+}
+
+
+void loop() {
+
+  // Keep server running
+  server.handleClient();
+
+
+  // Check Serial Monitor
+  if (Serial.available()) {
+
+    String message = Serial.readStringUntil('\n');
+
+    message.trim();
+
+    if (message.length() > 0) {
+      sendMessage(message);
+    }
+  }
+}`},
+      {label:"esp8266_B_messenger.ino",file:"esp8266_B_messenger.ino",code:`// ---------- ESP8266  B ----------
+// Identical to board A's sketch, except otherESP points back at board A.
+// Flash this to board B and set otherESP to board A's IP address.
+
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+const char* ssid = "YOUR_WIFI";
+const char* password = "YOUR_PASSWORD";
+
+// IP address of ESP8266 A
+const char* otherESP = "192.168.1.104";   // <-- board A's IP goes here
+
+ESP8266WebServer server(80);
+
+
+// Receive message
+void receiveMessage() {
+
+  if (server.hasArg("msg")) {
+
+    String message = server.arg("msg");
+
+    Serial.print("Received: ");
+    Serial.println(message);
+
+    server.send(200, "text/plain", "Message received");
+  }
+}
+
+
+// Send message
+void sendMessage(String message) {
+
+  WiFiClient client;
+
+  String url = "http://" + String(otherESP) +
+               "/message?msg=" + message;
+
+  Serial.print("Sending: ");
+  Serial.println(message);
+
+  if (client.connect(otherESP, 80)) {
+
+    client.println("GET " + url + " HTTP/1.1");
+    client.println("Host: " + String(otherESP));
+    client.println("Connection: close");
+    client.println();
+
+    delay(100);
+
+    client.stop();
+
+  } else {
+
+    Serial.println("Connection failed!");
+  }
+}
+
+
+void setup() {
+
+  Serial.begin(115200);
+
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi Connected!");
+
+  Serial.print("My IP: ");
+  Serial.println(WiFi.localIP());
+
+  // Receiver endpoint
+  server.on("/message", receiveMessage);
+
+  server.begin();
+
+  Serial.println("Server started");
+
+  Serial.println();
+  Serial.println("Type message in Serial Monitor:");
+}
+
+
+void loop() {
+
+  // Keep server running
+  server.handleClient();
+
+
+  // Check Serial Monitor
+  if (Serial.available()) {
+
+    String message = Serial.readStringUntil('\n');
+
+    message.trim();
+
+    if (message.length() > 0) {
+      sendMessage(message);
+    }
+  }
+}`}
+    ]}
+]}
+];
+
+/* ================= HELPERS ================= */
+const KW = new Set(["void","int","float","long","short","const","if","else","for","while","do","return","volatile","bool","boolean","byte","char","unsigned","static","true","false","String","uint8_t","uint16_t","uint32_t","break","continue","switch","case"]);
+const CONSTS = new Set(["HIGH","LOW","INPUT","OUTPUT","INPUT_PULLUP","WL_CONNECTED","LED_BUILTIN"]);
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function highlight(code){
+  var re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|(^[ \t]*#[^\n]*)|(\b0x[0-9a-fA-F]+\b|\b\d+\.?\d*\b)|([A-Za-z_]\w*)/gm;
+  var out = "", last = 0, m;
+  while ((m = re.exec(code)) !== null){
+    out += esc(code.slice(last, m.index));
+    var cls = "", t = m[0];
+    if (m[1]) cls = "t-c";
+    else if (m[2]) cls = m[2].indexOf("<") !== -1 || /^["']</.test(m[2]) ? "t-html" : "t-s";
+    else if (m[3]) cls = "t-p";
+    else if (m[4]) cls = "t-n";
+    else if (m[5]){
+      if (KW.has(t)) cls = "t-k";
+      else if (CONSTS.has(t) || /^D\d$/.test(t) || /^A\d$/.test(t)) cls = "t-c2";
+      else { var rest = code.slice(re.lastIndex).match(/^\s*(.)/); if (rest && rest[1] === "(") cls = "t-f"; }
+    }
+    out += cls ? '<span class="' + cls + '">' + esc(t) + "</span>" : esc(t);
+    last = re.lastIndex;
+  }
+  return out + esc(code.slice(last));
+}
+
+function el(tag, cls, text){
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+
+function copyText(text, btn){
+  function done(){
+    var old = btn.textContent;
+    btn.textContent = "Copied";
+    btn.classList.add("done");
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove("done"); }, 1500);
+  }
+  function fallback(){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); done(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+  else fallback();
+}
+
+/* ================= CARD BUILD ================= */
+function buildCard(it){
+  var card = el("article","card");
+  card.id = slug(it.n);
+  var btn = el("button","card-btn");
+  btn.type = "button";
+  btn.setAttribute("aria-expanded","false");
+  btn.appendChild(el("span","tag",it.tag));
+  btn.appendChild(el("span","card-title",it.n));
+  btn.appendChild(el("span","card-sub",it.d));
+  var right = el("span","right");
+  right.appendChild(el("span","pins-badge",it.pins));
+  right.appendChild(el("span","chev"));
+  btn.appendChild(right);
+  card.appendChild(btn);
+
+  var body = el("div","card-body");
+  var info = el("div","info");
+
+  info.appendChild(el("h4",null,"What it does"));
+  info.appendChild(el("p",null,it.d));
+
+  if (it.pinsTable && it.pinsTable.length){
+    info.appendChild(el("h4",null,"Connections"));
+    var t = el("table","pins");
+    var thead = el("thead"), hr = el("tr");
+    hr.appendChild(el("th",null,"Part")); hr.appendChild(el("th",null,"Connect to"));
+    thead.appendChild(hr); t.appendChild(thead);
+    var tb = el("tbody");
+    it.pinsTable.forEach(function(p){ var r = el("tr"); r.appendChild(el("td",null,p[0])); r.appendChild(el("td",null,p[1])); tb.appendChild(r); });
+    t.appendChild(tb); info.appendChild(t);
+  }
+  if (it.lib){
+    info.appendChild(el("h4",null,"Library needed"));
+    info.appendChild(el("p",null,it.lib));
+  }
+  if (it.warn){
+    var w = el("div","warn"); w.appendChild(el("b",null,"Note: ")); w.appendChild(document.createTextNode(it.warn)); info.appendChild(w);
+  }
+  if (it.tips && it.tips.length){
+    info.appendChild(el("h4",null,"Tips"));
+    var ul = el("ul","tips");
+    it.tips.forEach(function(x){ ul.appendChild(el("li",null,x)); });
+    info.appendChild(ul);
+  }
+  if (it.demo){
+    var d = el("div","demo");
+    d.appendChild(el("div","demo-label",it.demo.label));
+    it.demo.buttons.forEach(function(b){ var s = el("span","phone-btn",b); d.appendChild(s); d.appendChild(document.createElement("br")); });
+    info.appendChild(d);
+  }
+  body.appendChild(info);
+
+  if (it.codes && it.codes.length){
+    var box = el("div","codebox");
+    var tabs = el("div","codetabs");
+    var bar = el("div","codebar");
+    var fileEl = el("span");
+    var copyBtn = el("button","copy","Copy code"); copyBtn.type = "button";
+    bar.appendChild(fileEl); bar.appendChild(copyBtn);
+    var pre = el("pre"), codeEl = el("code");
+    pre.appendChild(codeEl);
+    var current = 0, tabBtns = [];
+    function show(i){
+      current = i;
+      var c = it.codes[i];
+      fileEl.textContent = c.file;
+      codeEl.innerHTML = highlight(c.code);
+      tabBtns.forEach(function(b, j){ b.setAttribute("aria-selected", j === i ? "true" : "false"); });
+    }
+    if (it.codes.length > 1){
+      it.codes.forEach(function(c, i){
+        var b = el("button","codetab",c.label); b.type = "button"; b.setAttribute("role","tab");
+        b.addEventListener("click", function(){ show(i); });
+        tabs.appendChild(b); tabBtns.push(b);
+      });
+      box.appendChild(tabs);
+    } else {
+      var only = el("button","codetab",it.codes[0].label); only.type = "button"; only.disabled = true; only.setAttribute("aria-selected","true");
+      tabs.appendChild(only); tabBtns.push(only); box.appendChild(tabs);
+    }
+    copyBtn.addEventListener("click", function(){ copyText(it.codes[current].code, copyBtn); });
+    box.appendChild(bar); box.appendChild(pre);
+    show(0);
+    body.appendChild(box);
+  }
+  card.appendChild(body);
+
+  btn.addEventListener("click", function(){ setOpen(card, !card.classList.contains("open")); });
+  return card;
+}
+
+function setOpen(card, open){
+  card.classList.toggle("open", open);
+  card.querySelector(".card-btn").setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+/* ================= PAGE ================= */
+var content = document.getElementById("content");
+var toggleAllBtn = document.getElementById("toggleAll");
+
+var totalItems = 0;
+CATS.forEach(function(c){ totalItems += c.items.length; });
+document.getElementById("statItems").textContent = totalItems;
+document.getElementById("statCats").textContent = CATS.length;
+
+function render(){
+  content.textContent = "";
+  CATS.forEach(function(cat, idx){
+    var sec = el("section","cat"); sec.id = "cat-" + cat.id; sec.style.setProperty("--cc", cat.color);
+    var head = el("div","cat-head");
+    head.appendChild(el("span","cat-num", String(idx + 1)));
+    var tw = el("div");
+    tw.appendChild(el("h2",null,cat.title));
+    tw.appendChild(el("p",null,cat.desc));
+    head.appendChild(tw); sec.appendChild(head);
+    cat.items.forEach(function(it){ sec.appendChild(buildCard(it)); });
+    content.appendChild(sec);
+  });
+  toggleAllBtn.textContent = "Expand all";
+}
+
+toggleAllBtn.addEventListener("click", function(){
+  var cards = content.querySelectorAll(".card");
+  var expand = toggleAllBtn.textContent === "Expand all";
+  cards.forEach(function(c){ setOpen(c, expand); });
+  toggleAllBtn.textContent = expand ? "Collapse all" : "Expand all";
+});
+
+render();
+</script>
+</body>
+</html>
